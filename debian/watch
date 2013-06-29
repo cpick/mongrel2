@@ -1,0 +1,3 @@
+version=3
+
+http://mongrel2.org/home /static/downloads/mongrel2-(.*)\.tar\.bz2 debian uupdate

@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+#include /usr/share/dpatch/dpatch.make
+
+#export DH_VERBOSE=1
+export DH_OPTIONS
+
+%: 
+	[ "$(findstring $@,patch unpatch)" = "" ] && dh $@ || exit 0
+
+override_dh_strip:
+	dh_strip --dbg-package=mongrel2-dbg
+
+override_dh_auto_clean:
+	$(MAKE) clean
+	rm -rf $(CURDIR)/examples/python/build $(CURDIR)/examples/python/m2py.egg-info $(CURDIR)/tests/request_payloads.txt
+
+override_dh_auto_install:
+	$(MAKE) install PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp
+	cd examples/python; python ./setup.py install --root=$(CURDIR)/debian/python-mongrel2 --prefix=/usr

@@ -1,0 +1,33 @@
+Source: mongrel2
+Section: universe/web
+Priority: extra
+Maintainer: Sabin Iacob <iacobs@m0n5t3r.info>
+Build-Depends: dpatch, debhelper (>= 7), sqlite3, libzmq-dev (>= 2.1.0), libsqlite3-dev, python-support
+Standards-Version: 3.8.3
+Homepage: http://mongrel2.org/
+
+Package: mongrel2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, sqlite3
+Description: application/language/network architecture agnostic web server
+ Mongrel2 is an application, language, and network architecture agnostic 
+ web server that focuses on web applications using modern browser technologies.
+
+Package: mongrel2-doc
+Architecture: all
+Description: documentation for mongrel2
+ documentation for mongrel2
+
+Package: mongrel2-dbg
+Architecture: any
+Section: universe/devel
+Description: debug symbols for mongrel2
+ debug symbols for mongrel2
+
+Package: python-mongrel2
+Architecture: any
+Section: universe/devel
+Depends: ${shlibs:depends}, ${misc:depends}, python-nose, python-simplejson, python-storm, python-pyrepl 
+Description: mongrel2 handler Python library
+ Python library for writing mongrel2 handlers
+
