@@ -1,3 +1,5 @@
 version=3
 
-http://mongrel2.org/home /static/downloads/mongrel2-(.*)\.tar\.bz2 debian uupdate
+opts=filenamemangle=s/.+\/v?(.*)\.tar\.gz/mongrel2-$1.tar.gz/ \
+    https://github.com/zedshaw/mongrel2/tags .*/v?(\d[\d\.]+)\.tar\.gz \
+    debian uupdate
