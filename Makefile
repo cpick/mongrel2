@@ -16,7 +16,7 @@ TEST_SRC=$(wildcard tests/*_tests.c)
 TESTS=$(patsubst %.c,%,${TEST_SRC})
 MAKEOPTS=OPTFLAGS="${NOEXTCFLAGS} ${OPTFLAGS}" OPTLIBS="${OPTLIBS}" LIBS="${LIBS}" DESTDIR="${DESTDIR}" PREFIX="${PREFIX}"
 
-all: bin/mongrel2 tests m2sh
+all: bin/mongrel2 tests m2sh procer
 
 dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra $(OPTFLAGS) -D_FILE_OFFSET_BITS=64
 dev: all
@@ -50,6 +50,7 @@ clean:
 	${MAKE} -C tools/filters OPTLIB=${OPTLIB} clean
 	${MAKE} -C tests/filters OPTLIB=${OPTLIB} clean
 	${MAKE} -C tools/config_modules OPTLIB=${OPTLIB} clean
+	${MAKE} -C tools/procer OPTLIB=${OPTLIB} clean
 
 pristine: clean
 	sudo rm -rf examples/python/build examples/python/dist examples/python/m2py.egg-info
@@ -60,6 +61,7 @@ pristine: clean
 	rm -f logs/*
 	rm -f run/*
 	${MAKE} -C tools/m2sh pristine
+	${MAKE} -C tools/procer pristine
 
 .PHONY: tests
 tests: tests/config.sqlite ${TESTS} test_filters filters config_modules
@@ -81,8 +83,11 @@ check:
 	@echo Files with potentially dangerous functions.
 	@egrep '[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?sn?printf|byte_)' $(filter-out src/bstr/bsafe.c,${SOURCES})
 
-m2sh: 
+m2sh: build/libm2.a
 	${MAKE} ${MAKEOPTS} -C tools/m2sh all
+
+procer: build/libm2.a
+	${MAKE} ${MAKEOPTS} -C tools/procer all
 
 test_filters: build/libm2.a
 	${MAKE} ${MAKEOPTS} -C tests/filters all
@@ -93,12 +98,15 @@ filters: build/libm2.a
 config_modules: build/libm2.a
 	${MAKE} ${MAKEOPTS} -C tools/config_modules all
 
+# Try to install first before creating target directory and trying again
 install: all
-	install -d $(DESTDIR)/$(PREFIX)/bin/
-	install bin/mongrel2 $(DESTDIR)/$(PREFIX)/bin/
+	install bin/mongrel2 $(DESTDIR)/$(PREFIX)/bin/ \
+	    || ( install -d $(DESTDIR)/$(PREFIX)/bin/ \
+	        && install bin/mongrel2 $(DESTDIR)/$(PREFIX)/bin/ )
 	${MAKE} ${MAKEOPTS} -C tools/m2sh install
 	${MAKE} ${MAKEOPTS} -C tools/config_modules install
 	${MAKE} ${MAKEOPTS} -C tools/filters install
+	${MAKE} ${MAKEOPTS} -C tools/procer install
 
 examples/python/mongrel2/sql/config.sql: src/config/config.sql src/config/mimetypes.sql
 	cat src/config/config.sql src/config/mimetypes.sql > $@
@@ -110,7 +118,7 @@ ragel:
 	ragel -G2 src/http11/httpclient_parser.rl
 
 valgrind:
-	valgrind --leak-check=full --show-reachable=yes --log-file=valgrind.log --suppressions=tests/valgrind.sup ./bin/mongrel2 tests/config.sqlite localhost
+	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" ${MAKE}
 
 %.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -147,19 +155,23 @@ release:
 
 netbsd: OPTFLAGS += -I/usr/local/include -I/usr/pkg/include
 netbsd: OPTLIBS += -L/usr/local/lib -L/usr/pkg/lib
+netbsd: LIBS=-lzmq -lsqlite3 $(OPTLIBS)
 netbsd: dev
 
 
 freebsd: OPTFLAGS += -I/usr/local/include
 freebsd: OPTLIBS += -L/usr/local/lib -pthread
+freebsd: LIBS=-lzmq -lsqlite3 $(OPTLIBS)
 freebsd: all
 
 openbsd: OPTFLAGS += -I/usr/local/include
 openbsd: OPTLIBS += -L/usr/local/lib -pthread
+openbsd: LIBS=-lzmq -lsqlite3 $(OPTLIBS)
 openbsd: all
 
 solaris: OPTFLAGS += -I/usr/local/include
 solaris: OPTLIBS += -L/usr/local/lib -R/usr/local/lib -lsocket -lnsl -lsendfile
+solaris: OPTLIBS += -L/lib -R/lib
 solaris: all
 
 
