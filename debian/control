@@ -1,7 +1,7 @@
 Source: mongrel2
 Section: universe/web
 Priority: extra
-Maintainer: Sabin Iacob <iacobs@m0n5t3r.info>
+Maintainer: Chris Pick <chris@chrispick.com>
 Build-Depends: dpatch, debhelper (>= 7), sqlite3, libzmq-dev (>= 2.1.0), libsqlite3-dev, python-support
 Standards-Version: 3.8.3
 Homepage: http://mongrel2.org/
