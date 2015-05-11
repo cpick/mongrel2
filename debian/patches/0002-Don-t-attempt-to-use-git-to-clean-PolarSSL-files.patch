@@ -1,0 +1,32 @@
+From: Chris Pick <chris@chrispick.com>
+Date: Mon, 11 May 2015 18:45:22 -0400
+Subject: Don't attempt to use git to clean PolarSSL files
+
+When attempting a build from an unpacked release tarball there is no local git
+repository and so git commands cannot be run.
+
+We may want to apply the patch in reverse to get back to the original state.
+---
+ Makefile | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7a10b65..ab6ffcb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -85,7 +85,6 @@ clean:
+ 	rm -f tools/lemon/lemon
+ 	rm -f tools/m2sh/tests/tests.log 
+ 	find . \( -name "*.gcno" -o -name "*.gcda" \) -exec rm {} \;
+-	git -C src/polarssl checkout include/polarssl/config.h
+ 	${MAKE} -C tools/m2sh OPTLIB=${OPTLIB} clean
+ 	${MAKE} -C tools/filters OPTLIB=${OPTLIB} clean
+ 	${MAKE} -C tests/filters OPTLIB=${OPTLIB} clean
+@@ -102,7 +101,6 @@ pristine: clean
+ 	rm -f run/*
+ 	${MAKE} -C tools/m2sh pristine
+ 	${MAKE} -C tools/procer pristine
+-	git submodule deinit -f src/polarssl
+ 
+ .PHONY: tests
+ tests: tests/config.sqlite ${TESTS} test_filters filters config_modules
