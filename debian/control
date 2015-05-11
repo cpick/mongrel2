@@ -2,8 +2,10 @@ Source: mongrel2
 Section: universe/web
 Priority: extra
 Maintainer: Chris Pick <chris@chrispick.com>
-Build-Depends: debhelper (>= 7), sqlite3, libzmq-dev (>= 2.1.0), libsqlite3-dev, python-support
-Standards-Version: 3.8.3
+Build-Depends: debhelper (>= 8), sqlite3, libzmq-dev (>= 2.1.0), libsqlite3-dev, python-support
+Standards-Version: 3.9.5
+Vcs-Git: https://github.com/zedshaw/mongrel2.git
+Vcs-Browser: https://github.com/zedshaw/mongrel2
 Homepage: http://mongrel2.org/
 
 Package: mongrel2
