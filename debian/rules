@@ -1,13 +1,11 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
-#include /usr/share/dpatch/dpatch.make
-
 #export DH_VERBOSE=1
 export DH_OPTIONS
 
 %: 
-	[ "$(findstring $@,patch unpatch)" = "" ] && dh $@ || exit 0
+	dh $@
 
 override_dh_strip:
 	dh_strip --dbg-package=mongrel2-dbg
